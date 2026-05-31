@@ -1,0 +1,7 @@
+playwright
+pandas
+openpyxl
+asyncio
+python-dotenv
+tqdm
+requests
