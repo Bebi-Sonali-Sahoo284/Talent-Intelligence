@@ -27,6 +27,16 @@ playwright install chromium
 ```
 
 ## How to Run
+
+### Recommended — use the launcher (Windows)
+```bat
+.\launch.bat
+```
+This clears the `output/` folder and runs the scraper in one step. Always run this instead of `python main.py` directly so you start each run with a clean output folder.
+
+> **Note:** Close `companies.xlsx` in Excel before running, otherwise Windows will block the file write.
+
+### Manual run
 ```bash
 python main.py
 ```
@@ -47,6 +57,8 @@ talent-intelligence/
 ├── logs/
 │   └── scraper.log            # Generated log file
 ├── main.py                    # Pipeline orchestrator
+├── launch.bat                 # Windows launcher — clears output/ then runs main.py
+├── launch.sh                  # Bash launcher (Git Bash / WSL / Linux / macOS)
 ├── requirements.txt
 └── README.md
 ```

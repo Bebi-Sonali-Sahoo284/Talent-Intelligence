@@ -87,6 +87,17 @@ async def main():
     df = df.drop_duplicates(subset=["company_name"], keep="first")
     df = df.fillna("N/A")
 
+    # open_positions: convert floats (e.g. 4.0) to int strings; keep "N/A" as-is.
+    # Without this, Excel round-trips lose "N/A" because pandas infers a float column.
+    def _clean_positions(val):
+        try:
+            if str(val) in ("N/A", "nan", ""):
+                return "N/A"
+            return str(int(float(val)))
+        except (ValueError, TypeError):
+            return "N/A"
+    df["open_positions"] = df["open_positions"].apply(_clean_positions)
+
     expected_cols = [
         "company_name", "industry", "total_funding", "funding_stage",
         "headquarters", "website", "description", "careers_page", "hiring_status",
@@ -108,7 +119,10 @@ async def main():
     df.to_excel(xlsx_path, index=False, engine="openpyxl")
 
     logger.info("STEP 5: Exporting JSON -> %s", json_path)
-    df.to_json(json_path, orient="records", indent=2)
+    # Explicit UTF-8 write — pandas to_json() uses the system encoding on
+    # Windows (cp1252) which crashes on Unicode chars in company names/descriptions.
+    with open(json_path, "w", encoding="utf-8") as f:
+        f.write(df.to_json(orient="records", indent=2, force_ascii=False))
 
     hiring_count = len(df[df["hiring_status"] == "Hiring"])
     not_hiring_count = len(df[df["hiring_status"] == "Not Hiring"])
